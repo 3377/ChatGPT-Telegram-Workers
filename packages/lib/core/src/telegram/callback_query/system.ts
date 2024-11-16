@@ -1,12 +1,10 @@
 import type * as Telegram from 'telegram-bot-api-types';
-import type { WorkerContext } from '../../config/context';
-import type { AgentUserConfig } from '../../config/env';
-import type { CallbackQueryHandler } from '../../telegram/callback_query/types';
+import type { AgentUserConfig, WorkerContext } from '../../config';
+import type { CallbackQueryHandler } from './types';
 import { CHAT_AGENTS, loadChatLLM } from '../../agent';
-import { ENV } from '../../config/env';
-import { TELEGRAM_AUTH_CHECKER } from '../../telegram/auth/auth';
-import { MessageSender } from '../../telegram/utils/send';
-import { setUserConfig } from '../../telegram/utils/utils';
+import { ENV } from '../../config';
+import { TELEGRAM_AUTH_CHECKER } from '../auth';
+import { MessageSender } from '../sender';
 
 export class AgentListCallbackQueryHandler implements CallbackQueryHandler {
     prefix = 'al:';
@@ -145,10 +143,11 @@ export class ModelChangeCallbackQueryHandler implements CallbackQueryHandler {
         if (!chatAgent?.modelKey) {
             throw new Error(`modelKey not found: ${agent}`);
         }
-        await setUserConfig({
+        await context.execChangeAndSave({
             AI_PROVIDER: agent,
             [chatAgent.modelKey]: model,
-        }, context);
+        });
+        console.log('Change model:', agent, model);
         const message: Telegram.EditMessageTextParams = {
             chat_id: query.message.chat.id,
             message_id: query.message.message_id,

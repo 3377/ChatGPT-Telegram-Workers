@@ -50,6 +50,8 @@ export const ENV_KEY_MAPPER: Record<string, string> = {
     WORKERS_AI_MODEL: 'WORKERS_CHAT_MODEL',
 };
 
+export type CustomMessageRender = (mode: string | null, message: string) => string;
+
 class Environment extends EnvironmentConfig {
     // -- 版本数据 --
     //
@@ -67,6 +69,8 @@ class Environment extends EnvironmentConfig {
 
     DATABASE: KVNamespace = null as any;
     API_GUARD: APIGuard | null = null;
+
+    CUSTOM_MESSAGE_RENDER: CustomMessageRender | null = null;
 
     constructor() {
         super();
@@ -166,9 +170,9 @@ class Environment extends EnvironmentConfig {
         }
 
         // 选择对应语言的SYSTEM_INIT_MESSAGE
-        if (!this.USER_CONFIG.SYSTEM_INIT_MESSAGE) {
-            this.USER_CONFIG.SYSTEM_INIT_MESSAGE = this.I18N?.env?.system_init_message || 'You are a helpful assistant';
-        }
+        // if (!this.USER_CONFIG.SYSTEM_INIT_MESSAGE) {
+        //     this.USER_CONFIG.SYSTEM_INIT_MESSAGE = this.I18N?.env?.system_init_message || 'You are a helpful assistant';
+        // }
         // 兼容旧版 GOOGLE_COMPLETIONS_API
         if (source.GOOGLE_COMPLETIONS_API && !this.USER_CONFIG.GOOGLE_API_BASE) {
             this.USER_CONFIG.GOOGLE_API_BASE = source.GOOGLE_COMPLETIONS_API.replace(/\/models\/?$/, '');
